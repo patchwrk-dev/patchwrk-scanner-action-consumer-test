@@ -1,0 +1,63 @@
+name: PatchWRK pinned consumer qualification
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    types: [opened]
+permissions:
+  contents: read
+concurrency:
+  group: consumer-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+jobs:
+  consume:
+    if: >-
+      github.repository == 'patchwrk-dev/patchwrk-scanner-action-consumer-test' &&
+      ((github.event_name == 'pull_request' && github.base_ref == 'main' &&
+       ((github.event.pull_request.head.repo.full_name == 'patchwrk-dev/patchwrk-scanner-action-consumer-test' && github.head_ref == 'case/same-repo') ||
+        (github.event.pull_request.head.repo.full_name == '1jovansimon/patchwrk-scanner-action-consumer-test' && github.head_ref == 'case/fork'))) ||
+       ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout trusted verification code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
+          path: trusted
+          persist-credentials: false
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+      - id: target
+        name: Checkout inert target at event commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          path: target
+          persist-credentials: false
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+      - id: runtime
+        uses: patchwrk-dev/patchwrk-scanner/.github/patchwrk-action-qualification/runtime@542affc4913b5c3ee55b506470f36dc0304b17fb
+      - name: Snapshot inert fixture
+        env:
+          CONSUMER_NODE: ${{ steps.runtime.outputs.node }}
+        run: '"$CONSUMER_NODE" trusted/harness/check.mjs before'
+      - id: scan
+        uses: patchwrk-dev/patchwrk-scanner/action@542affc4913b5c3ee55b506470f36dc0304b17fb
+        with:
+          path: target/fixtures/project
+      - name: Verify consumer contract and unchanged source
+        env:
+          CONSUMER_NODE: ${{ steps.runtime.outputs.node }}
+          CONSUMER_RESULT: ${{ steps.scan.outputs.result }}
+          CONSUMER_STATUS: ${{ steps.scan.outputs.status }}
+          CONSUMER_EVENT: ${{ github.event_name }}
+          CONSUMER_FORK: ${{ github.event.pull_request.head.repo.fork }}
+          CONSUMER_TARGET_SHA: ${{ steps.target.outputs.commit }}
+          CONSUMER_BASE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
+        run: '"$CONSUMER_NODE" trusted/harness/check.mjs after'
