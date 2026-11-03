@@ -50,6 +50,6 @@ async function main(){
   const event=process.env.CONSUMER_EVENT;assert.ok(['push','workflow_dispatch','pull_request'].includes(event));
   for(const sha of [process.env.CONSUMER_TARGET_SHA,process.env.CONSUMER_BASE_SHA])assert.match(sha,/^[a-f0-9]{40}$/);
   if(event==='pull_request')assert.ok(['true','false'].includes(process.env.CONSUMER_FORK));
-  console.log(JSON.stringify({consumer:'PASS',actionCommit:'542affc4913b5c3ee55b506470f36dc0304b17fb',engineCommit:engine,node:process.versions.node,platform:process.platform,arch:process.arch,event,fork:process.env.CONSUMER_FORK==='true',targetCommit:process.env.CONSUMER_TARGET_SHA,trustedBaseCommit:process.env.CONSUMER_BASE_SHA,status:r.status,discoveries:r.discoveries,counts:r.counts,sourceUnchanged:true,canaryNotExecuted:true}));
+  console.log(JSON.stringify({consumer:'PASS',actionCommit:'4f7aa523e0bd9038f0d1a6144cbda50b571f25e3',actionRepository:'patchwrk-dev/patchwrk-action',engineCommit:engine,node:process.versions.node,platform:process.platform,arch:process.arch,event,fork:process.env.CONSUMER_FORK==='true',targetCommit:process.env.CONSUMER_TARGET_SHA,trustedBaseCommit:process.env.CONSUMER_BASE_SHA,status:r.status,discoveries:r.discoveries,counts:r.counts,sourceUnchanged:true,canaryNotExecuted:true}));
 }
 if(process.argv[1] && import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href){main().catch(()=>{console.error('Consumer verification failed; sensitive fixture/result details withheld.');process.exitCode=1;});}

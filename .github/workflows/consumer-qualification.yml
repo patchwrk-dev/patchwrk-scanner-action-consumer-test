@@ -1,4 +1,4 @@
-name: PatchWRK pinned consumer qualification
+name: PatchWRK relocated Action qualification
 on:
   push:
     branches: [main]
@@ -12,12 +12,63 @@ concurrency:
   group: consumer-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: false
 jobs:
+  producer:
+    if: github.repository == 'patchwrk-dev/patchwrk-scanner-action-consumer-test' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          path: verifier
+          persist-credentials: false
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: patchwrk-dev/patchwrk-scanner
+          ref: 542affc4913b5c3ee55b506470f36dc0304b17fb
+          path: harness
+          persist-credentials: false
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: patchwrk-dev/patchwrk-action
+          ref: 4f7aa523e0bd9038f0d1a6144cbda50b571f25e3
+          path: trusted/action
+          persist-credentials: false
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+      - id: runtime
+        uses: patchwrk-dev/patchwrk-scanner/.github/patchwrk-action-qualification/runtime@542affc4913b5c3ee55b506470f36dc0304b17fb
+      - name: Verify frozen distribution inventory
+        env:
+          QUALIFICATION_NODE: ${{ steps.runtime.outputs.node }}
+        run: '"$QUALIFICATION_NODE" verifier/harness/integrity.mjs'
+      - name: Prepare inert synthetic input
+        env:
+          QUALIFICATION_NODE: ${{ steps.runtime.outputs.node }}
+        run: '"$QUALIFICATION_NODE" harness/.github/patchwrk-action-qualification/prepare.mjs'
+      - id: scan
+        uses: patchwrk-dev/patchwrk-action@4f7aa523e0bd9038f0d1a6144cbda50b571f25e3
+        with:
+          path: synthetic
+      - name: Verify outputs and native failure contracts
+        env:
+          QUALIFICATION_NODE: ${{ steps.runtime.outputs.node }}
+          QUALIFICATION_RESULT: ${{ steps.scan.outputs.result }}
+          QUALIFICATION_STATUS: ${{ steps.scan.outputs.status }}
+        run: '"$QUALIFICATION_NODE" harness/.github/patchwrk-action-qualification/verify.mjs'
   consume:
     if: >-
       github.repository == 'patchwrk-dev/patchwrk-scanner-action-consumer-test' &&
       ((github.event_name == 'pull_request' && github.base_ref == 'main' &&
-       ((github.event.pull_request.head.repo.full_name == 'patchwrk-dev/patchwrk-scanner-action-consumer-test' && github.head_ref == 'case/same-repo') ||
-        (github.event.pull_request.head.repo.full_name == '1jovansimon/patchwrk-scanner-action-consumer-test' && github.head_ref == 'case/fork'))) ||
+       ((github.event.pull_request.head.repo.full_name == 'patchwrk-dev/patchwrk-scanner-action-consumer-test' && github.head_ref == 'relocation/same-repo') ||
+        (github.event.pull_request.head.repo.full_name == '1jovansimon/patchwrk-scanner-action-consumer-test' && github.head_ref == 'relocation/fork'))) ||
        ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'))
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -48,7 +99,7 @@ jobs:
           CONSUMER_NODE: ${{ steps.runtime.outputs.node }}
         run: '"$CONSUMER_NODE" trusted/harness/check.mjs before'
       - id: scan
-        uses: patchwrk-dev/patchwrk-scanner/action@542affc4913b5c3ee55b506470f36dc0304b17fb
+        uses: patchwrk-dev/patchwrk-action@4f7aa523e0bd9038f0d1a6144cbda50b571f25e3
         with:
           path: target/fixtures/project
       - name: Verify consumer contract and unchanged source
