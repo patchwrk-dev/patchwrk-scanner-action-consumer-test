@@ -1,0 +1,19 @@
+[
+  ".github/actions/node24-probe/action.yml",
+  ".github/actions/node24-probe/main.mjs",
+  ".github/workflows/consumer-qualification.yml",
+  "LICENSE",
+  "README.md",
+  "fixtures/project/.env",
+  "fixtures/project/package.json",
+  "fixtures/project/src/DO_NOT_EXECUTE.js",
+  "fixtures/project/src/index.ts",
+  "fixtures/project/src/quoted.cjs",
+  "fixtures/unsupported/dynamic.ts",
+  "harness/check.mjs",
+  "harness/expected-inventory.json",
+  "harness/expected-result.json",
+  "harness/integrity.mjs",
+  "harness/producer-files.json",
+  "harness/repository-files.json"
+]

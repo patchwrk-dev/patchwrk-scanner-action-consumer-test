@@ -1,1 +1,14 @@
-{"name":"inert-synthetic-consumer-fixture","private":true,"dependencies":{"stripe":"12.0.0","openai":"4.0.0","@anthropic-ai/sdk":"0.20.0","@shopify/shopify-api":"9.0.0","twilio":"5.0.0"},"scripts":{"postinstall":"exit 77"}}
+{
+  "name": "patchwrk-synthetic-only",
+  "private": true,
+  "dependencies": {
+    "stripe": "12.0.0",
+    "openai": "4.0.0",
+    "@anthropic-ai/sdk": "0.20.0",
+    "@shopify/shopify-api": "9.0.0",
+    "twilio": "5.0.0"
+  },
+  "scripts": {
+    "postinstall": "exit 77"
+  }
+}

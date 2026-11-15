@@ -1,3 +1,17 @@
+# Action 0.1.1 — proposed separate-consumer qualification
+
+This local proposal replaces .github/workflows/consumer-qualification.yml in place
+with one push-main job and the reviewed Node24 checkout pin. The former producer
+and consume jobs, PR trigger and workflow_dispatch trigger are absent. No remote
+change has occurred. The workflow is now bound to producer commit
+`9bc7c1dd79eccf8ab55abbe09fb5f70de1f53e7a`. Consumer commit/push and its
+automatic hosted run remain subject to separate founder authorization.
+
+The trusted probe/harness applies only to a founder-reviewed main push, never an
+untrusted PR. Existing LICENSE and legacy expected-inventory/integrity helpers are
+retained as historical files; the replacement workflow does not invoke the legacy
+helpers. No second workflow is added. The original v0.1.0 runs remain historical.
+
 # Inert PatchWRK Action consumer qualification
 
 Synthetic test repository only; not a product, package or Action release.

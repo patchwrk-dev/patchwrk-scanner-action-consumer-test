@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "engineCommit": "8fa08313e65b4d313460936e606d2f3f92979c16+local-quoted-commonjs",
+  "catalogVersion": "3",
+  "status": "complete",
+  "discoveries": {"stripe":1,"openai":1,"anthropic":1,"shopify":1,"twilio":1},
+  "counts": {"affected":1,"potentially-affected":2,"not-affected-by-this-change":1,"unknown":0},
+  "findings": [
+    {"provider":"openai","changeId":"openai.gpt-4-0314.retirement","status":"not-affected-by-this-change","count":1},
+    {"provider":"openai","changeId":"openai.text-davinci-003.retirement","status":"affected","count":1},
+    {"provider":"stripe","changeId":"stripe.sdk12.removed-constructor-aliases","status":"potentially-affected","count":1},
+    {"provider":"stripe","changeId":"stripe.sdk8.request-option-rename","status":"potentially-affected","count":1}
+  ],
+  "filesScanned": 4,
+  "catalogRecords": 4,
+  "coverage": {"discovery":true,"analysis":true,"compatibility":true,"truncated":false},
+  "limitations": [
+    "Static evidence only; not a compatibility or production-health guarantee.",
+    "Five-family discovery; four historical Stripe/OpenAI catalog records.",
+    "No locations, source, credentials or raw diagnostics in this minimized output."
+  ]
+}

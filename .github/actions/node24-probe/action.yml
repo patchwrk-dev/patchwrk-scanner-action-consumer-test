@@ -1,0 +1,8 @@
+name: Qualification Node24 probe
+description: Records the runner-provided Node24 executable
+outputs:
+  node:
+    description: Validated executable path
+runs:
+  using: node24
+  main: main.mjs
